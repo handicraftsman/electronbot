@@ -528,7 +528,7 @@ module.exports = class extends events.EventEmitter {
         reject(err);
       }
     });
-    if (f == undefined) {
+    if (f.length == 0) {
       this.db.run(
         'INSERT INTO groupinfo (server, host, name) VALUES (?, ?, ?);',
         [sock.name, host, group]
