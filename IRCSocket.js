@@ -90,7 +90,7 @@ module.exports = class {
     if (addr.ssl) {
       this.sock = tls.connect({host: addr.host, port: addr.port}, connHandler);
     } else {
-      this.sock = new TCPSocket();
+      this.sock = new Socket();
       this.sock.connect({host: addr.host, port: addr.port}, connHandler);
     }
 
