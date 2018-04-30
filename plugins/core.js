@@ -19,6 +19,7 @@ module.exports = class extends (require('../Plugin')) {
       ;
 
     this.newGroup('admin')
+      .addCmd('eval', 'eval')
       .addCmd('reload', 'root')
       .addCmd('raw', 'root')
       .addCmd('join', 'targeted')
@@ -95,6 +96,19 @@ module.exports = class extends (require('../Plugin')) {
       'Sends the given message to the server'
     ).setHandler((e, c) => {
       e.sock.writeq(c.acc);
+    });
+
+    let cmdEval = this.newCommand('eval');
+    cmdEval.addBranch(
+      'eval',
+      '...',
+      'Evaluates given JS line'
+    ).setHandler((e, c) => {
+      try {
+        e.reply(`${require('util').inspect(eval(c.acc))}`);
+      } catch (err) {
+        e.reply(`${err}`);
+      }
     });
 
     let cmdReload = this.newCommand('reload');

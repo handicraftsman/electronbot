@@ -9,7 +9,7 @@ module.exports = class {
   }
 
   [util.inspect.custom]() {
-    return `<Command>`;
+    return `<Command name='${this.name}'>`;
   }
 
   addBranch(name, definition, description) {

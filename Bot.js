@@ -15,7 +15,7 @@ const IRCSocket = require('./IRCSocket');
  * join: sock, nick, user, host, chan
  * part: sock, nick, user, host, chan, reason
  * quit: sock, nick, user, host, reason
- * privmsg: sock, nick, user, host, target, reason
+ * privmsg: sock, nick, user, host, target, message
  */
 
 process.on('uncaughtException', function(err) {

@@ -1,3 +1,5 @@
+const util = require('util');
+
 module.exports = class {
   constructor(name, tdef, description) {
     this.name            = name;
@@ -54,6 +56,10 @@ module.exports = class {
     for (let word of this.options) {
       this.helpDef += '[--' + word + '=?] ';
     }
+  }
+
+  [util.inspect.custom]() {
+    return `<CommandBranch name='${this.name}'>`;
   }
 
   setHandler(handler) {

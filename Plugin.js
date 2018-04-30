@@ -1,3 +1,5 @@
+const util = require('util');
+
 module.exports = class {
   constructor(name, version, description, bot) {
     this.name          = name;
@@ -10,6 +12,10 @@ module.exports = class {
     this.commands      = {};
     this.groups        = {};
     this.helpEntries   = {};
+  }
+
+  [util.inspect.custom]() {
+    return `<Plugin name='${this.name}'>`;
   }
 
   addHelp(name, entry) {
