@@ -9,7 +9,7 @@ module.exports = async (bot) => {
   this.config = bot.config.help || {};
   this.config.publicHost = this.config.publicHost || process.env.HOST || 'localhost';
   this.config.publicPort = parseInt(this.config.publicPort || process.env.PORT || '8080');
-  this.config.port = process.env.PORT || this.config.publicPort;
+  this.config.port = process.env.PORT || this.config.port || this.config.publicPort;
 
   var logger = require('./newLog')('help');
   var helpServer = express();
@@ -30,7 +30,7 @@ module.exports = async (bot) => {
     res.render('plugin', { req: req, res: res, bot: bot, pname: req.params.plugin });
   });
 
-  helpServer.listen(this.config.publicPort, () => {
+  helpServer.listen(this.config.port, () => {
     logger.important(`Serving help on http://${this.config.publicHost}:${this.config.publicPort}`);
   });
 
