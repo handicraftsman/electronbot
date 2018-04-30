@@ -1,0 +1,56 @@
+doctype html
+html
+  head
+    title #{bot.config.name} Help
+    
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    
+    script(src='/static/mdl/material.min.js')
+    
+    link(rel='stylesheet', href='https://fonts.googleapis.com/icon?family=Material+Icons')
+    link(rel='stylesheet', href='/static/mdl/material.min.css')
+    link(rel='stylesheet', href='/static/mdl/material.blue_grey-blue.min.css')
+
+    style.
+      .app-text {
+        margin: 8px;
+        max-width: 60%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      @media only screen and (min-width: 800px) {
+        .app-text {
+          max-width: 40%;
+        }
+      }
+      .app-text .app-title {
+        text-align: center;
+      }
+      .group-name {
+        margin-bottom: 0;
+        text-align: center;
+      }
+      .group-list {
+        margin-top: 0;
+        text-align: center;
+      }
+      .group-list-item {
+        margin-left: 40%;
+      }
+
+  body
+    .mdl-layout.mdl-js-layout
+      header.mdl-layout__header.mdl-layout_header--scroll
+        .mdl-layout__header-row
+          span.mdl-layout-title #{bot.config.name} Help
+          nav.mdl-navigation
+            a.mdl-navigation__link(href='/') Home
+      .mdl-layout__drawer
+        span.mdl-layout-title #{bot.config.name} Help
+        nav.mdl-navigation
+          a.mdl-navigation__link(href='/') Home
+          each plugin, pname in bot.plugins
+            a.mdl-navigation__link(href=`/${pname}`) #{pname}
+      main.mdl-layout__content
+        div.page-content
+          block content
