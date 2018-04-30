@@ -27,12 +27,11 @@ module.exports = class extends (require('../Plugin')) {
       .addCmd('group', 'add')
       .addCmd('group', 'remove')
       .addCmd('group', 'check')
+      .addCmd('flag', 'enable')
+      .addCmd('flag', 'disable')
+      .addCmd('flag', 'remove')
+      .addCmd('flag', 'check')
       ;
-
-    //this.bot.on('connect', async ({sock}) => {
-      //let f = await this.bot.getFlag(this, sock, '##helloworlders', 'foo');
-      //this.bot.setFlag(this, sock, '##helloworlders', 'foo', true);
-    //});
 
     let cmdHelp = this.newCommand('help');
     cmdHelp.addBranch(
@@ -182,6 +181,60 @@ module.exports = class extends (require('../Plugin')) {
       }
       let groups = await this.bot.getGroups(e.sock, host);
       e.nreply(`${host}\'s groups: ${Array.from(groups).join(', ')}`);
+    });
+
+    let cmdFlag = this.newCommand('flag');
+    cmdFlag.addBranch(
+      'enable',
+      '!enable plugin flag',
+      'Enables given flag in the current channel'
+    ).setHandler((e, c) => {
+      let plugin = this.bot.plugins[c.positionals.plugin];
+      if (!plugin) {
+        e.nreply('Invalid plugin name!');
+        return;
+      }
+      this.bot.setFlag(plugin, e.sock, e.target, c.positionals.flag, true);
+      e.nreply('Done!');
+    });
+    cmdFlag.addBranch(
+      'disable',
+      '!disable plugin flag',
+      'Disables given flag in the current channel'
+    ).setHandler((e, c) => {
+      let plugin = this.bot.plugins[c.positionals.plugin];
+      if (!plugin) {
+        e.nreply('Invalid plugin name!');
+        return;
+      }
+      this.bot.setFlag(plugin, e.sock, e.target, c.positionals.flag, false);
+      e.nreply('Done!');
+    });
+    cmdFlag.addBranch(
+      'remove',
+      '!remove plugin flag',
+      'Removes given flag from the current channel'
+    ).setHandler((e, c) => {
+      let plugin = this.bot.plugins[c.positionals.plugin];
+      if (!plugin) {
+        e.nreply('Invalid plugin name!');
+        return;
+      }
+      this.bot.removeFlag(plugin, e.sock, e.target, c.positionals.flag);
+      e.nreply('Done!');
+    });
+    cmdFlag.addBranch(
+      'check',
+      '!check plugin flag',
+      'Checks given flag in the current channel'
+    ).setHandler(async (e, c) => {
+      let plugin = this.bot.plugins[c.positionals.plugin];
+      if (!plugin) {
+        e.nreply('Invalid plugin name!');
+        return;
+      }
+      let f = await this.bot.getFlag(plugin, e.sock, e.target, c.positionals.flag);
+      e.nreply(`${(f == null ? 'undefined' : f).toString()}`);
     });
   }
 }

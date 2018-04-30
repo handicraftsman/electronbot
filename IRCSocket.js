@@ -2,6 +2,7 @@ const util = require('util');
 const net = require('net');
 const tls = require('tls');
 const readline = require('readline');
+const fs = require('fs');
 
 rgxAddress = /^(.+?)(?:\/(\+)?(\d{1,5}))?$/;
 
@@ -88,7 +89,15 @@ module.exports = class {
     };
 
     if (addr.ssl) {
-      this.sock = tls.connect({host: addr.host, port: addr.port}, connHandler);
+      if (this.config.cert && this.config.key) {
+        let ctx = tls.createSecureContext({
+          cert: fs.readFileSync(this.config.cert),
+          key: fs.readFileSync(this.config.key)
+        });
+        this.sock = tls.connect({host: addr.host, port: addr.port, secureContext: ctx}, connHandler);
+      } else {
+        this.sock = tls.connect({host: addr.host, port: addr.port}, connHandler);
+      }
     } else {
       this.sock = new net.Socket();
       this.sock.connect({host: addr.host, port: addr.port}, connHandler);

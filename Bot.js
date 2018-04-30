@@ -18,8 +18,16 @@ const IRCSocket = require('./IRCSocket');
  * privmsg: sock, nick, user, host, target, reason
  */
 
+process.on('uncaughtException', function(err) {
+  console.log(err);
+});
+
+process.on('unhandledRejection', function(err) {
+  console.log(err);
+})
+
 module.exports = class extends events.EventEmitter {
-  constructor({configPath = './electronbot.json', dbPath = './electronbot.db' }, doneCallback) {
+  constructor({configPath = './electronbot.json', dbPath = './electronbot.db', searchdir = './'}, doneCallback) {
     super();
 
     process.on('uncaughtException', function(err) {
@@ -28,6 +36,7 @@ module.exports = class extends events.EventEmitter {
 
     this.configPath = configPath;
     this.dbPath     = dbPath;
+    this.searchdir  = searchdir;
 
     this.log = require('./newLog')('bot');
     this.log.important('Hello, World!');
@@ -46,7 +55,7 @@ module.exports = class extends events.EventEmitter {
       let server = this.config.servers[sname];
       server.prefix = server.prefix || this.config.prefix
       server.nick = server.nick || this.config.nick;
-      server.user = server.nick || this.config.user || server.user;
+      server.user = server.user || server.nick || this.config.user;
       server.rnam = server.rnam || this.config.rnam;
       if (typeof(server.auth) == 'string') {
         server.auth = {
@@ -106,8 +115,11 @@ module.exports = class extends events.EventEmitter {
     this.config.plugins = new Set(this.config.plugins);
     this.config.plugins.add('./plugins/core')
     for (let pname of this.config.plugins.values()) {
+      pname = pname.replace(/@/, this.searchdir);
       delete require.cache[require.resolve(pname)];
-      this.plugins[path.basename(pname)] = new (require(pname))(path.basename(pname), this);
+      this.plugins[path.basename(pname)] = new (require(require.resolve(pname, {
+        paths: [this.searchdir, __dirname]
+      })))(path.basename(pname), this);
     }
 
     this.groups = new Map();
@@ -188,7 +200,8 @@ module.exports = class extends events.EventEmitter {
           },
           nreply: (msg) => {
             sock.notice(m[1], msg);
-          }
+          },
+          replyTo: (m[4] == sock.config.nick) ? m[1] : m[4]
         });
       } else if (m = msg.match(rgxPing)) {
         this.emit('ping', {sock: sock, target: m[1]});
@@ -259,6 +272,7 @@ module.exports = class extends events.EventEmitter {
             cBranch: cs[2],
             reply: e.reply,
             nreply: e.nreply,
+            replyTo: e.replyTo,
             nick: e.nick,
             user: e.user,
             host: e.host,
@@ -273,6 +287,7 @@ module.exports = class extends events.EventEmitter {
             cBranch: undefined,
             reply: e.reply,
             nreply: e.nreply,
+            replyTo: e.replyTo,
             nick: e.nick,
             user: e.user,
             host: e.host,
@@ -287,6 +302,7 @@ module.exports = class extends events.EventEmitter {
             cBranch: undefined,
             reply: e.reply,
             nreply: e.nreply,
+            replyTo: e.replyTo,
             nick: e.nick,
             user: e.user,
             host: e.host,
@@ -444,6 +460,13 @@ module.exports = class extends events.EventEmitter {
         [plugin.name, sock.name, channel, name, value]
       );
     }
+  }
+
+  async removeFlag(plugin, sock, channel, name) {
+    this.db.run(
+      'DELETE FROM flags WHERE plugin=? AND server=? AND channel=? AND name=?',
+      [plugin.name, sock.name, channel, name]
+    );
   }
 
   // todo
