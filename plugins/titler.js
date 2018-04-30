@@ -11,7 +11,7 @@ module.exports = class extends (require('../Plugin')) {
       if (!m) { return; }
       let m2 = (e.nick + '!' + e.user + '@' + e.host).match(/bot/);
       if (m2) { return; }
-      let f = this.bot.getFlag(this, e.sock, e.target, 'enable-titler');
+      let f = await this.bot.getFlag(this, e.sock, e.target, 'enable-titler');
       if (!f) { return; }
 
       let res = await require('axios').get(m[0]);
