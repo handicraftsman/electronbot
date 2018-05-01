@@ -14,9 +14,16 @@ module.exports = class extends (require('../Plugin')) {
       let f = await this.bot.getFlag(this, e.sock, e.target, 'enable-titler');
       if (!f) { return; }
 
-      let res = await require('axios').get(m[0]);
-      let dom = new (require('jsdom').JSDOM)(res.data);
-      e.reply(`^ ${dom.window.document.title}`);
+      require('axios').get(m[0], {timeout: 5000, maxContentLength: 1000000}).then((res) => {
+        if (res.headers['content-type'].match(/text\/html/)) {
+          let dom = new (require('jsdom').JSDOM)(res.data);
+          e.reply(`^ ${dom.window.document.title}`);
+        } else {
+          e.reply(`^ ${res.headers['content-type']}`);
+        }
+      }).catch((err) => {
+        e.reply(`^ ${err}`);
+      })
     });
   }
 }
