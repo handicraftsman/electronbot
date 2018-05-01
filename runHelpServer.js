@@ -26,8 +26,9 @@ module.exports = async (bot) => {
   helpServer.get('/:plugin', (req, res) => {
     if (bot.plugins[req.params.plugin] == undefined) {
       res.send('Cannot find such plugin!');
+    } else {
+      res.render('plugin', { req: req, res: res, bot: bot, pname: req.params.plugin });
     }
-    res.render('plugin', { req: req, res: res, bot: bot, pname: req.params.plugin });
   });
 
   helpServer.listen(this.config.port, () => {

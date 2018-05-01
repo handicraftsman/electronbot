@@ -5,6 +5,13 @@ block content
     each group, gname in bot.groups
       h5.group-name #{gname}
       ul.group-list
-      each perm in Array.from(group)
-        li.group-list-item
-          span #{perm}
+        each perm in Array.from(group)
+          li.group-list-item
+            span #{perm}
+    each plugin, pname in bot.plugins
+      each group, gname in plugin.groups
+        h5.group-name #{pname}/#{gname}
+        ul.group-list
+          each perm in Array.from(group)
+            li.group-list-item
+              span #{perm}

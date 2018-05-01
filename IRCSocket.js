@@ -216,4 +216,8 @@ module.exports = class {
   remove(chan, nick, reason = 'Bye!') {
     this.writeq(`REMOVE ${chan} ${nick} :${reason}`);
   }
+
+  mode(chan, args) {
+    this.writeq(`MODE ${chan} ${args}`);
+  }
 }

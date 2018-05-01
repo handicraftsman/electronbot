@@ -112,8 +112,10 @@ module.exports = class extends events.EventEmitter {
 
   setupPluginsAndGroups() {
     this.plugins = new Map();
-    this.config.plugins = new Set(this.config.plugins);
-    this.config.plugins.add('./plugins/core')
+    let plist = this.config.plugins;
+    this.config.plugins = new Set();
+    this.config.plugins.add('./plugins/core');
+    for (let pname of plist) { this.config.plugins.add(pname); }
     for (let pname of this.config.plugins.values()) {
       pname = pname.replace(/@/, this.searchdir);
       delete require.cache[require.resolve(pname)];
@@ -178,7 +180,7 @@ module.exports = class extends events.EventEmitter {
 
     const rgxPrivmsg = /^:(.+?)!(.+?)@(.+?) PRIVMSG (.+?) :(.+)$/;
     const rgxPing = /^PING :(.+)$/;
-    const rgxCode = /^:.+? (\d\d\d) .+? (.+)$/
+    const rgxCode = /^:.+? (\d\d\d) .+? (.+)$/;
     const rgxJoin = /^:(.+?)!(.+?)@(.+?) JOIN (.+)$/;
     const rgxPart = /^:(.+?)!(.+?)@(.+?) PART (.+?) :(.+)$/;
     const rgxNick = /^:(.+?)!(.+?)@(.+?) NICK :(.+)$/;
